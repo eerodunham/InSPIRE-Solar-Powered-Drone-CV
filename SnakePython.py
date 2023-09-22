@@ -35,11 +35,13 @@ snakeArray.append(head)
 CELL_SIZE = 20
 BOARD_SIZE = 20
 SNAKE_SPEED = 5
-
 gameOver = False
 ax = 12
 ay = 12
 score = 0
+lastx = 0
+lasty = 0
+appleIsEaten = False
 
 
 def updateBoard(snakeArray, ax, ay):
@@ -58,7 +60,7 @@ while (True):
     #update apple
     if (snakeArray[0].x == ax and snakeArray[0].y == ay):
         score += 1
-        snakeArray.append(SnakeBody((snakeArray[-1].x), (snakeArray[-1].y), snakeArray[len(snakeArray) - 1]))
+        appleIsEaten = True
         #generate array of all possible spaces
         locate = [[i for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)]
         #each space that has a head or body object is removed
@@ -74,9 +76,13 @@ while (True):
         column = rand.choice(locate[row])
         ax = row
         ay = column
-    
+    lastx = snakeArray[-1].x
+    lasty = snakeArray[-1].y
     for segment in snakeArray:
         segment.update()
+    if (appleIsEaten):
+        snakeArray.append(SnakeBody(lastx, lasty, snakeArray[len(snakeArray) - 1]))
+        appleIsEaten = False
     updateBoard(snakeArray, ax, ay)
     
     pressed = cv.waitKey(int(1000/SNAKE_SPEED))
