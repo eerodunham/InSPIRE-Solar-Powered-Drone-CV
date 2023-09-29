@@ -7,8 +7,12 @@ class SnakeHead:
     def __init__(self, x, y, direction):
         self.x = x
         self.y = y
+        self.prevx: int
+        self.prevy: int
         self.direction = direction
     def update(self):
+        self.prevx = self.x
+        self.prevy = self.y
         if self.direction == 'w':
             self.x -= 1
         elif self.direction == 's':
@@ -23,10 +27,14 @@ class SnakeBody:
     def __init__(self, x, y, ahead):
         self.x = x
         self.y = y
+        self.prevx: int
+        self.prevy: int
         self.ahead = ahead
     def update(self):
-        self.x = self.ahead.x
-        self.y = self.ahead.y
+        self.prevx = self.x
+        self.prevy = self.y
+        self.x = self.ahead.prevx
+        self.y = self.ahead.prevy
 
 
 head = SnakeHead(10, 10, "w")
@@ -78,12 +86,17 @@ while (True):
         ay = column
     lastx = snakeArray[-1].x
     lasty = snakeArray[-1].y
+    
+    updateBoard(snakeArray, ax, ay)
+
+    if (appleIsEaten): 
+        snakeArray.append(SnakeBody(snakeArray[len(snakeArray) - 1].prevx, snakeArray[len(snakeArray) - 1].prevy, snakeArray[len(snakeArray) - 1]))
+        appleIsEaten = not appleIsEaten
+
     for segment in snakeArray:
         segment.update()
-    if (appleIsEaten):
-        snakeArray.append(SnakeBody(lastx, lasty, snakeArray[len(snakeArray) - 1]))
-        appleIsEaten = False
-    updateBoard(snakeArray, ax, ay)
+
+    
     
     pressed = cv.waitKey(int(1000/SNAKE_SPEED))
     if pressed == ord("k"):
