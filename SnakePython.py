@@ -1,6 +1,5 @@
 import cv2 as cv
 import numpy as np
-import time
 import random as rand
 
 class SnakeHead:
@@ -47,8 +46,6 @@ gameOver = False
 ax = 12
 ay = 12
 score = 0
-lastx = 0
-lasty = 0
 appleIsEaten = False
 
 
@@ -67,8 +64,7 @@ while (True):
     
     #update apple
     if (snakeArray[0].x == ax and snakeArray[0].y == ay):
-        score += 1
-        appleIsEaten = True
+        snakeArray.append(SnakeBody(snakeArray[len(snakeArray) - 1].prevx, snakeArray[len(snakeArray) - 1].prevy, snakeArray[len(snakeArray) - 1]))
         #generate array of all possible spaces
         locate = [[i for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)]
         #each space that has a head or body object is removed
@@ -76,29 +72,27 @@ while (True):
         for body in snakeArray[1:]:
             locate[body.x][body.y] = 20
         for i in range(len(locate)):
-            for j in range(len(locate[i]) - 1):
+            bound = len(locate[i])
+            j = 0
+            while (j < bound):
                 if locate[i][j] == 20:
                     locate[i].pop(j)
+                    bound -= 1
+                else:
+                    j += 1
+
         #randomly select next apple coords from remaining spaces and update screen
-        row = rand.randint(0, BOARD_SIZE)
+        row = rand.randint(0, BOARD_SIZE - 1)
         column = rand.choice(locate[row])
         ax = row
         ay = column
-    lastx = snakeArray[-1].x
-    lasty = snakeArray[-1].y
-    
+
     updateBoard(snakeArray, ax, ay)
-
-    if (appleIsEaten): 
-        snakeArray.append(SnakeBody(snakeArray[len(snakeArray) - 1].prevx, snakeArray[len(snakeArray) - 1].prevy, snakeArray[len(snakeArray) - 1]))
-        appleIsEaten = not appleIsEaten
-
     for segment in snakeArray:
         segment.update()
-
-    
-    
+        
     pressed = cv.waitKey(int(1000/SNAKE_SPEED))
+
     if pressed == ord("k"):
         break
     elif pressed == ord("w"):
@@ -110,17 +104,17 @@ while (True):
     elif pressed == ord("d"):
         snakeArray[0].direction = "d"
     
-
+    dead = False
     if snakeArray[0].x < 0 or snakeArray[0].x > 19:
-        print( )
-        print(snakeArray)
-        break
+        dead = True
     if snakeArray[0].y < 0 or snakeArray[0].y > 19:
-        break
+        dead = True
     for body in snakeArray[1:]:
         if snakeArray[0].x == body.x and snakeArray[0].y == body.y:
+            dead = True
             break
-    
+    if dead:
+        break
 
 
 
