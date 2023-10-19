@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import random as rand
-
+#comment
 class SnakeHead:
     def __init__(self, x, y, direction):
         self.x = x
